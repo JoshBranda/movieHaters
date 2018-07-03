@@ -5,7 +5,7 @@ This program is designed to allow users to review movies and see their friends' 
 
 - Users only see reviews from friends, removing the flood of random strangers' reviews.
 - Users are able to post questions on movies.  Friends who have seen the movies will receive alerts (and ideally answer the questions)
-- Users have access to long-form film analysis (currently not available on rotten tomatoes, imdb, or wikipedia)
+- Users have access to long-form film analysis (currently not available on rotten tomatoes, imdb, letterboxd, or wikipedia)
 
 # License
 
