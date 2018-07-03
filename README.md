@@ -1,4 +1,4 @@
-# movieHaters
+# Movie Haters
 "The app to review movies and lose friends"
 
 This program is designed to allow users to review movies and see their friends' reviews.  Although a similar app exists in the form of letterboxd, this app differs in key ways:
