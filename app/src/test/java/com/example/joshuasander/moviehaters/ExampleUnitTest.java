@@ -14,6 +14,7 @@ package com.example.joshuasander.moviehaters;
 
 import android.util.JsonReader;
 
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -99,7 +100,7 @@ public class ExampleUnitTest {
 
         String omdbEndpoint = api;
 
-        String response = downloadUrl(omdbEndpoint);
+        String response = parseIt(downloadUrl(omdbEndpoint));
 
         int x = 5+ 5;
     }
@@ -111,7 +112,7 @@ public class ExampleUnitTest {
         InputStream is = null;
         // Only display the first 500 characters of the retrieved
         // web page content.
-        int len = 500;
+        int len = 5000;
 
         try {
             URL url = new URL(myurl);
@@ -122,12 +123,13 @@ public class ExampleUnitTest {
             conn.setDoInput(true);
             // Starts the query
             conn.connect();
-            int response = conn.getResponseCode();
+//            int response = conn.getResponseCode();
 //            Log.d(DEBUG_TAG, "The response is: " + response);
             is = conn.getInputStream();
 
             // Convert the InputStream into a string
             String contentAsString = readIt(is, len);
+            contentAsString = contentAsString.replace("\u0000", "");
             return contentAsString;
 
             // Makes sure that the InputStream is closed after the app is
@@ -146,5 +148,18 @@ public class ExampleUnitTest {
         char[] buffer = new char[len];
         reader.read(buffer);
         return new String(buffer);
+    }
+
+    public String parseIt(String input) throws Exception {
+        String input2 = "{ \"name\":\"John\" }";
+        JSONObject jsonObject = new JSONObject(input2);
+
+        String result = jsonObject.getString("title") + "\n";
+        result += "year: " + jsonObject.getString("year") + "\n";
+        result += "imdb rating: " + jsonObject.getString("imdbRating") + "\n";
+
+        return result;
+
+//        return input;
     }
 }
