@@ -17,12 +17,14 @@ import android.util.JsonReader;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.junit.Assert.*;
@@ -35,131 +37,117 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
 
     private final String api = "http://www.omdbapi.com/";
+    private final String server = "http://ec2-13-59-63-149.us-east-2.compute.amazonaws.com:3000";
 
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
 
+
+//    @Test
+//    public void testApi2() throws Exception {
+//
+//        String omdbEndpoint = api;
+//
+//        String response = parseIt(downloadUrl(omdbEndpoint));
+//
+//        int x = 5 + 5;
+//    }
+
     @Test
-    public void testApi() throws Exception {
+    public void sendGet() throws Exception {
+        URL obj = new URL(server);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-        boolean connectionEstablished = false;
-        String response = "";
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
 
-
-        URL omdbEndpoint = new URL(api);
-
-        // Create connection
-        HttpURLConnection myConnection =
-                (HttpURLConnection) omdbEndpoint.openConnection();
-
-        myConnection.setRequestMethod("GET");
-        myConnection.setDoInput(true);
-
-        if (myConnection.getResponseCode() == 200) {
-            connectionEstablished = true;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
         }
+        in.close();
 
-        myConnection.connect();
-
-        InputStream responseBody = myConnection.getInputStream();
-
-        InputStreamReader responseBodyReader =
-                new InputStreamReader(responseBody, "UTF-8");
-
-        JsonReader jsonReader = new JsonReader(responseBodyReader);
-
-        jsonReader.beginObject(); // Start processing the JSON object
-
-        while (jsonReader.hasNext()) { // Loop through all keys
-
-            String key = jsonReader.nextName(); // Fetch the next key
-
-            if (key.equals("Title")) { // Check if desired key
-
-                // Fetch the value as a String
-                response = jsonReader.nextString();
-
-
-                break; // Break out of the loop
-            } else {
-                jsonReader.skipValue(); // Skip values of other keys
-            }
-        }
-
-        jsonReader.close();
-
-        myConnection.disconnect();
-
-        assertEquals(connectionEstablished, true);
+        System.out.println(response.toString());
     }
 
     @Test
-    public void testApi2() throws Exception{
+    public void getHomeTest() {
 
-        String omdbEndpoint = api;
+        String path = "";
+       String result = connect(path);
 
-        String response = parseIt(downloadUrl(omdbEndpoint));
-
-        int x = 5+ 5;
+       assertNotNull(result);
     }
 
-    // Given a URL, establishes an HttpUrlConnection and retrieves
-// the web page content as a InputStream, which it returns as
-// a string.
-    private String downloadUrl(String myurl) throws IOException {
-        InputStream is = null;
-        // Only display the first 500 characters of the retrieved
-        // web page content.
-        int len = 5000;
+    @Test
+    public void getSubTest() {
+        boolean success = false;
 
-        try {
-            URL url = new URL(myurl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            // Starts the query
-            conn.connect();
-//            int response = conn.getResponseCode();
-//            Log.d(DEBUG_TAG, "The response is: " + response);
-            is = conn.getInputStream();
+        String path = "/login";
+        String name = "josh";
+        String pass = "password";
+        String result = connect(path + "?" + "name=" + name + "&pass=" + pass);
 
-            // Convert the InputStream into a string
-            String contentAsString = readIt(is, len);
-            contentAsString = contentAsString.replace("\u0000", "");
-            return contentAsString;
+        success = resultIsNull(result);
 
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
-        } finally {
-            if (is != null) {
-                is.close();
+        assertFalse(success);
+        assertNotNull(result);
+    }
+
+    public String connect(String input) {
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+
+        try
+        {
+            URL url = new URL(server + input);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+
+            InputStream stream = connection.getInputStream();
+
+            reader = new BufferedReader(new InputStreamReader(stream));
+
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+
+            buffer.append(reader.readLine());
+
+            return buffer.toString();
+
+
+        } catch(
+        MalformedURLException e)
+
+        {
+            e.printStackTrace();
+        } catch(
+        IOException e)
+
+        {
+            e.printStackTrace();
+        } finally
+
+        {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        return null;
     }
 
-    // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
-    }
-
-    public String parseIt(String input) throws Exception {
-        String input2 = "{ \"name\":\"John\" }";
-        JSONObject jsonObject = new JSONObject(input2);
-
-        String result = jsonObject.getString("title") + "\n";
-        result += "year: " + jsonObject.getString("year") + "\n";
-        result += "imdb rating: " + jsonObject.getString("imdbRating") + "\n";
-
-        return result;
-
-//        return input;
+    public static boolean resultIsNull(String input) {
+        if (input.equals("[]")) {return true;}
+        return false;
     }
 }
