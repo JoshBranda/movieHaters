@@ -30,7 +30,7 @@ import java.net.URL;
 public class Login extends AppCompatActivity{
 
     private final String awsEC2 = "http://ec2-13-59-63-149.us-east-2.compute.amazonaws.com:3000";
-    private String userName = "josh";
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class Login extends AppCompatActivity{
         EditText userNameRaw = (EditText) findViewById(R.id.userName);
         EditText passwordRaw = (EditText) findViewById(R.id.password);
 
-        String userName = userNameRaw.getText().toString();
+        final String userName = userNameRaw.getText().toString();
         String password = passwordRaw.getText().toString();
 
         final String message = awsEC2 + "/login" + "?name=" + userName + "&pass=" + password;
@@ -58,6 +58,7 @@ public class Login extends AppCompatActivity{
                     }
                     else {
                         Intent intent = new Intent(Login.this, MainActivity.class);
+                        intent.putExtra("uname", userName);
                         startActivity(intent);
                     }
 

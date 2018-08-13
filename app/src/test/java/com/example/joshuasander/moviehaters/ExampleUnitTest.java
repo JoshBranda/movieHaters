@@ -36,42 +36,8 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
 
-    private final String api = "http://www.omdbapi.com/";
+//    private final String api = "http://www.omdbapi.com/";
     private final String server = "http://ec2-13-59-63-149.us-east-2.compute.amazonaws.com:3000";
-
-    @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
-    }
-
-
-//    @Test
-//    public void testApi2() throws Exception {
-//
-//        String omdbEndpoint = api;
-//
-//        String response = parseIt(downloadUrl(omdbEndpoint));
-//
-//        int x = 5 + 5;
-//    }
-
-    @Test
-    public void sendGet() throws Exception {
-        URL obj = new URL(server);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        System.out.println(response.toString());
-    }
 
     @Test
     public void getHomeTest() {
@@ -95,6 +61,16 @@ public class ExampleUnitTest {
 
         assertFalse(success);
         assertNotNull(result);
+    }
+
+    @Test
+    public void getOmdbInfo() {
+
+        String api = getKey();
+
+        String result = connectOmdb(api + "&t=shawshank_");
+
+        int x = 5 + 5;
     }
 
     public String connect(String input) {
@@ -149,5 +125,64 @@ public class ExampleUnitTest {
     public static boolean resultIsNull(String input) {
         if (input.equals("[]")) {return true;}
         return false;
+    }
+
+    public String connectOmdb(String input) {
+        HttpURLConnection connection = null;
+        BufferedReader reader = null;
+
+        try
+        {
+            URL url = new URL(input);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
+
+            InputStream stream = connection.getInputStream();
+
+            reader = new BufferedReader(new InputStreamReader(stream));
+
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+
+            buffer.append(reader.readLine());
+
+            return buffer.toString();
+
+
+        } catch(
+                MalformedURLException e)
+
+        {
+            e.printStackTrace();
+        } catch(
+                IOException e)
+
+        {
+            e.printStackTrace();
+        } finally
+
+        {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public String getKey() {
+        try  {
+            return connect("/api");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
