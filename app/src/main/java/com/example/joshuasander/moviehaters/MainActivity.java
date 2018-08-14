@@ -10,6 +10,7 @@ for license terms.
 
 package com.example.joshuasander.moviehaters;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     private String api = "";
     private final String awsEC2 = "http://ec2-13-59-63-149.us-east-2.compute.amazonaws.com:3000";
     private String userName;
+    private boolean newPage;
+    private String currentReview = null;
+    private String movieId;
+    private double[] aggregates = new double[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +104,21 @@ public class MainActivity extends AppCompatActivity {
                                 ((Button) findViewById(R.id.reviewStatus)).setVisibility(View.INVISIBLE);
                             }
                         });
+                        currentReview = null;
                         return;
                     }
+
+                    movieId = parseId(fullResponse);
+                    getFriends(userName, movieId, aggregates);
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                ((TextView) findViewById(R.id.aggregateInfo)).setVisibility(View.VISIBLE);
+                                ((TextView) findViewById(R.id.aggregateInfo)).setText("  Avg friend: " + aggregates[0] + "   Good tasters: " + aggregates[1] + "   Bad tasters: " + aggregates[2]);
+                            } catch (Exception e) {e.printStackTrace();}
+                        }
+                    });
 
                     runOnUiThread(new Runnable() {
                         public void run() {
@@ -108,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
                             ((TextView) findViewById(R.id.review)).setVisibility(View.VISIBLE);
                             ((Button) findViewById(R.id.reviewStatus)).setVisibility(View.VISIBLE);
                             ((TextView) findViewById(R.id.mainText)).setVisibility(View.VISIBLE);
+
+                            currentReview = "";
 
                             RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
                             ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -119,7 +139,13 @@ public class MainActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             try  {
-                                                connect("/update?name=" + userName + "&id=" + parseId(fullResponse) + "&rating=" + finalRating);
+                                                String check = connect("/check?name=" + userName + "&id=" + movieId);
+                                                if (check.equals("[]")) {
+                                                    connect("/insertReview?name=" + userName + "&id=" + movieId + "&rating=" + finalRating);
+                                                }
+                                                else {
+                                                    connect("/update?name=" + userName + "&id=" + movieId + "&rating=" + finalRating);
+                                                }
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
@@ -168,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                                     //https://stackoverflow.com/questions/4602902/how-to-set-the-text-color-of-textview-in-code
                                     ((TextView) findViewById(R.id.review)).setTextColor(Color.RED);
                                     ((TextView) findViewById(R.id.review)).setMovementMethod(new ScrollingMovementMethod());
+                                    currentReview = parseReview(yourData);
                                 } catch (Exception e) {e.printStackTrace();}
                             }
                         });
@@ -404,6 +431,90 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return null;
+    }
+
+    public void reviewPage(View view) {
+
+        if (currentReview == null) {
+            return;
+        }
+
+        Intent intent = new Intent(MainActivity.this, EditReview.class);
+        intent.putExtra("uname", userName);
+        intent.putExtra("currentReview", currentReview);
+        intent.putExtra("movieId", movieId);
+        startActivity(intent);
+    }
+
+    public void getFriends(String name, String id, double [] array) throws Exception{
+
+        String path = "/aggregate";
+        String path2 = "/aggregate2";
+
+        double starsTotal   = 0;
+        double starsTaste   = 0;
+        double starsBad     = 0;
+        int count           = 0;
+        int countTaste      = 0;
+        int countBad        = 0;
+
+        String result = connect(path + "?" + "name=" + name + "&id=" + id);
+        String [] friends = result.split(",");
+        String [] friendsResults;
+        String test;
+
+        for (int x = 0; x < friends.length; x+=2) {
+            test = connect(path2 + "?" + "name=" + friends[x] + "&id=" + id);
+            friendsResults = parseFriendsReview(test);
+
+            if (friendsResults == null) {
+                continue;
+            }
+
+            starsTotal += Double.parseDouble(friendsResults[0]);
+            count++;
+
+            if (friends[x + 1].equals("1")) {
+                starsBad += Double.parseDouble(friendsResults[0]);
+                countBad++;
+            }
+            else if (friends[x + 1].equals("2")) {
+                starsTaste += Double.parseDouble(friendsResults[0]);
+                countTaste++;
+            }
+        }
+
+        if (count != 0) {
+            starsTotal /= count;
+        }
+        if (countTaste != 0) {
+            starsTaste /= countTaste;
+        }
+        if (countBad != 0) {
+            starsBad /= countBad;
+        }
+
+        array[0] = starsTotal;
+        array[1] = starsTaste;
+        array[2] = starsBad;
+    }
+
+    public String [] parseFriendsReview(String input) throws Exception {
+        if (input.equals("[]")){
+            return null;
+        }
+
+        input = input.substring(1, input.length() - 1);
+
+        JSONObject jsonObject = new JSONObject(input);
+
+
+        String result = jsonObject.getString("stars");
+        String result2 = jsonObject.getString("review");
+
+        String [] finalResult = new String [] {result, result2};
+
+        return finalResult;
     }
 
 }

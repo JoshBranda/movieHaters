@@ -64,6 +64,89 @@ public class ExampleUnitTest {
     }
 
     @Test
+    public void insertReview() {
+        boolean success = false;
+
+        String path = "/insertReview";
+        String checkPath = "/check";
+        String name = "josh";
+        String id = "tt0073195";
+        String result = connect(checkPath + "?" + "name=" + name + "&id=" + id);
+
+        if (result.equals("[]")) {
+            result = connect(path + "?" + "name=" + name + "&id=" + id);
+        }
+
+        result = connect(checkPath + "?" + "name=" + name + "&id=" + id);
+
+        success = resultIsNull(result);
+
+        assertFalse(success);
+        assertNotNull(result);
+
+    }
+
+    @Test
+    public void getFriends() throws Exception{
+        boolean success = false;
+
+        String path = "/aggregate";
+        String path2 = "/aggregate2";
+        String name = "josh";
+        String id = "tt0111161";
+
+        double starsTotal   = 0;
+        double starsTaste   = 0;
+        double starsBad     = 0;
+        int count           = 0;
+        int countTaste      = 0;
+        int countBad        = 0;
+
+        String result = connect(path + "?" + "name=" + name + "&id=" + id);
+        String [] friends = result.split(",");
+        String [] friendsResults;
+        String test;
+
+        success = resultIsNull(result);
+
+        for (int x = 0; x < friends.length; x+=2) {
+            test = connect(path2 + "?" + "name=" + friends[x] + "&id=" + id);
+            friendsResults = parseFriendsReview(test);
+
+            if (friendsResults == null) {
+                continue;
+            }
+
+            starsTotal += Double.parseDouble(friendsResults[0]);
+            count++;
+
+            if (friends[x + 1].equals("1")) {
+                starsBad += Double.parseDouble(friendsResults[0]);
+                countBad++;
+            }
+            else if (friends[x + 1].equals("2")) {
+                starsTaste += Double.parseDouble(friendsResults[0]);
+                countTaste++;
+            }
+        }
+
+        if (count != 0) {
+            starsTotal /= count;
+        }
+        if (countTaste != 0) {
+            starsTaste /= countTaste;
+        }
+        if (countBad != 0) {
+            starsBad /= countBad;
+        }
+
+        success = resultIsNull(result);
+
+        assertFalse(success);
+        assertNotNull(result);
+    }
+
+    @Test
     public void getOmdbInfo() {
 
         String api = getKey();
@@ -184,5 +267,23 @@ public class ExampleUnitTest {
         }
 
         return null;
+    }
+
+    public String [] parseFriendsReview(String input) throws Exception {
+        if (input.equals("[]")){
+            return null;
+        }
+
+        input = input.substring(1, input.length() - 1);
+
+        JSONObject jsonObject = new JSONObject(input);
+
+
+        String result = jsonObject.getString("stars");
+        String result2 = jsonObject.getString("review");
+
+        String [] finalResult = new String [] {result, result2};
+
+        return finalResult;
     }
 }

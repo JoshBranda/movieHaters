@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
-            android:name=".MainActivity"
+            android:name=".Login"
             android:screenOrientation="portrait"
             >
             <intent-filter>
@@ -20,10 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity-->
-            <!--android:name=".MainActivity"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--&gt;</activity>-->
+        <activity
+        android:name=".EditReview"
+        android:screenOrientation="portrait"
+        ></activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            ></activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
