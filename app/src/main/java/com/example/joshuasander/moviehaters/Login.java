@@ -70,7 +70,6 @@ public class Login extends AppCompatActivity{
 
         thread.start();
 
-
     }
 
     public String connect(String input) {

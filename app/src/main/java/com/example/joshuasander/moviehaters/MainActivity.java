@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             try {
                                 ((TextView) findViewById(R.id.aggregateInfo)).setVisibility(View.VISIBLE);
-                                ((TextView) findViewById(R.id.aggregateInfo)).setText("  Avg friend: " + aggregates[0] + "   Good tasters: " + aggregates[1] + "   Bad tasters: " + aggregates[2]);
+                                ((TextView) findViewById(R.id.aggregateInfo)).setText(aggregrateResult(aggregates));
                             } catch (Exception e) {e.printStackTrace();}
                         }
                     });
@@ -515,6 +515,35 @@ public class MainActivity extends AppCompatActivity {
         String [] finalResult = new String [] {result, result2};
 
         return finalResult;
+    }
+
+    public String aggregrateResult(double [] array) {
+
+        String result = "  Avg friend: ";
+        if (aggregates[0] == 0) {
+            result += "N/A";
+        }
+        else {
+            result += aggregates[0];
+        }
+
+        result += "   Good tasters: ";
+        if (aggregates[1] == 0) {
+            result += "N/A";
+        }
+        else {
+            result += aggregates[1];
+        }
+
+        result += "   Bad tasters: ";
+        if (aggregates[2] == 0) {
+            result += "N/A";
+        }
+        else {
+            result += aggregates[2];
+        }
+
+        return result;
     }
 
 }

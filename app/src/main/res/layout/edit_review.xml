@@ -19,7 +19,7 @@
 
     <EditText
         android:id="@+id/editReview"
-        android:layout_width="380dp"
+        android:layout_width="360dp"
         android:layout_height="498dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
