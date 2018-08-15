@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -102,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
                                 ((RatingBar)findViewById(R.id.ratingBar)).setVisibility(View.INVISIBLE);
                                 ((TextView) findViewById(R.id.review)).setVisibility(View.INVISIBLE);
                                 ((Button) findViewById(R.id.reviewStatus)).setVisibility(View.INVISIBLE);
+                                ((TextView) findViewById(R.id.user1)).setVisibility(View.INVISIBLE);
+                                ((TextView) findViewById(R.id.review1)).setVisibility(View.INVISIBLE);
+                                ((TextView) findViewById(R.id.user2)).setVisibility(View.INVISIBLE);
+                                ((TextView) findViewById(R.id.review2)).setVisibility(View.INVISIBLE);
                             }
                         });
                         currentReview = null;
@@ -447,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getFriends(String name, String id, double [] array) throws Exception{
+        ArrayList<Review> reviews = new ArrayList<>();
 
         String path = "/aggregate";
         String path2 = "/aggregate2";
@@ -470,6 +476,8 @@ public class MainActivity extends AppCompatActivity {
             if (friendsResults == null) {
                 continue;
             }
+
+            reviews.add(new Review(friends[x], Double.parseDouble(friendsResults[0]), friendsResults[1]));
 
             starsTotal += Double.parseDouble(friendsResults[0]);
             count++;
@@ -497,6 +505,13 @@ public class MainActivity extends AppCompatActivity {
         array[0] = starsTotal;
         array[1] = starsTaste;
         array[2] = starsBad;
+
+        if (reviews.size() > 0) {
+            setReviewPanels(reviews);
+        }
+        else {
+            clearReviewPanels();
+        }
     }
 
     public String [] parseFriendsReview(String input) throws Exception {
@@ -544,6 +559,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return result;
+    }
+
+    public void setReviewPanels(final ArrayList<Review> reviews) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                for (int x = 0; x < reviews.size();x++) {
+                    if (x == 0) {
+                        ((TextView) findViewById(R.id.user1)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.review1)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.user1)).setText(reviews.get(x).getUname() + "\n" + reviews.get(x).getRating());
+                        ((TextView) findViewById(R.id.review1)).setText(reviews.get(x).getReview());
+                    }
+                    if (x == 1) {
+                        ((TextView) findViewById(R.id.user2)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.review2)).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.user2)).setText(reviews.get(x).getUname() + "\n" + reviews.get(x).getRating());
+                        ((TextView) findViewById(R.id.review2)).setText(reviews.get(x).getReview());
+                    }
+
+                }
+            }
+        });
+    }
+
+    public void clearReviewPanels() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                        ((TextView) findViewById(R.id.user1)).setVisibility(View.INVISIBLE);
+                        ((TextView) findViewById(R.id.review1)).setVisibility(View.INVISIBLE);
+                        ((TextView) findViewById(R.id.user2)).setVisibility(View.INVISIBLE);
+                        ((TextView) findViewById(R.id.review2)).setVisibility(View.INVISIBLE);
+
+            }
+        });
     }
 
 }
