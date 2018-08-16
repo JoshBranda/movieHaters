@@ -85,18 +85,19 @@
 
     <TextView
         android:id="@+id/review"
-        android:layout_width="198dp"
+        android:layout_width="190dp"
         android:layout_height="72dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/back"
+        android:background="@drawable/my_review"
+        android:paddingLeft="3dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:scrollbars="vertical"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/ratingBar"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/poster"
         app:layout_constraintTop_toBottomOf="@+id/reviewStatus" />
 
@@ -131,18 +132,28 @@
 
             <TextView
                 android:id="@+id/user1"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/reviews"
+                android:gravity="center"
                 android:text=""
+                android:textColor="?attr/colorAccent"
+                android:textSize="20sp"
                 android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/review1"
-                android:layout_width="wrap_content"
+                android:layout_width="260dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text=""
+                android:background="@drawable/reviews"
+                android:gravity="center"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
                 android:visibility="invisible" />
         </LinearLayout>
         <LinearLayout
@@ -152,18 +163,28 @@
 
             <TextView
                 android:id="@+id/user2"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:background="@drawable/reviews"
+                android:gravity="center"
                 android:text=""
+                android:textColor="?attr/colorAccent"
+                android:textSize="20sp"
                 android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/review2"
-                android:layout_width="wrap_content"
+                android:layout_width="260dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text=""
+                android:background="@drawable/reviews"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:gravity="center"
                 android:visibility="invisible" />
         </LinearLayout>
     </LinearLayout>
